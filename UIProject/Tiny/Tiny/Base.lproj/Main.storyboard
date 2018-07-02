@@ -260,7 +260,7 @@
                                 <rect key="frame" x="8" y="8" width="668" height="51"/>
                                 <subviews>
                                     <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vPd-rS-djz">
-                                        <rect key="frame" x="0.0" y="29" width="221" height="22"/>
+                                        <rect key="frame" x="0.0" y="29" width="668" height="22"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3KV-Ud-gDU">
                                                 <rect key="frame" x="-2" y="3" width="80" height="17"/>
@@ -271,7 +271,7 @@
                                                 </textFieldCell>
                                             </textField>
                                             <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Mzt-Fj-pEq">
-                                                <rect key="frame" x="84" y="0.0" width="137" height="22"/>
+                                                <rect key="frame" x="84" y="0.0" width="584" height="22"/>
                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Fill your TinyPNG key" drawsBackground="YES" id="qjl-Wv-6Hb">
                                                     <font key="font" metaFont="system"/>
                                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>

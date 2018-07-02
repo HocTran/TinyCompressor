@@ -25,9 +25,12 @@ class ViewController: NSViewController {
 //        return session
 //    }
     
-    var rootItem: Item! {
+    var items = [Item]() {
         didSet {
-            flatItems = rootItem.flatImageItems()
+            items.forEach {
+                $0.debug()
+            }
+            flatItems = items.flatMap { $0.flatImageItems() }
         }
     }
     
@@ -51,15 +54,19 @@ class ViewController: NSViewController {
         guard let window = view.window else { return }
         
         let panel = NSOpenPanel()
-        panel.canChooseFiles = false
+        panel.canChooseFiles = true
         panel.canChooseDirectories = true
-        panel.allowsMultipleSelection = false
+        panel.allowsMultipleSelection = true
+        panel.allowedFileTypes = [
+            "jpg", "JPG", "Jpg",
+            "jpeg", "JPEG", "Jpeg",
+            "png", "PNG", "Png"
+        ]
+        panel.allowsOtherFileTypes = false
         
         panel.beginSheetModal(for: window) { (result) in
             if result == .OK {
-                let url = panel.urls[0]
-                self.rootItem = Item(fileUrl: url, parent: nil)
-                self.rootItem.debug()
+                self.items = panel.urls.map { Item(fileUrl: $0, parent: nil) }
                 self.outlineView.reloadData()
                 self.outlineView.expandItem(nil, expandChildren: true)
             }
@@ -131,7 +138,7 @@ extension ViewController: NSOutlineViewDataSource {
         if let i = item as? Item {
             return i.children?.count ?? 0
         } else {
-            return rootItem == nil ? 0 : 1
+            return items.count
         }
     }
     
@@ -139,7 +146,7 @@ extension ViewController: NSOutlineViewDataSource {
         if let i = item as? Item {
             return i.children![index]
         } else {
-            return rootItem
+            return items[index]
         }
     }
     
