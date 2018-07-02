@@ -11,14 +11,15 @@ import Cocoa
 enum ItemStatus {
     case ready
     case loading
-    case finished(error: Error?)
+    case success(compress: Double)
+    case failed(error: Error)
     
     var color: NSColor {
         switch self {
         case .ready:    return .white
         case .loading:  return .yellow
-        case .finished(let error):
-            return error == nil ? .green : .red
+        case .success:  return .green
+        case .failed:   return .red
         }
     }
     
@@ -26,8 +27,22 @@ enum ItemStatus {
         switch self {
         case .ready:    return "Ready"
         case .loading:  return "Loading"
-        case .finished(let error):
-            return error == nil ? "Success" : "Failed"
+        case .success:  return "Success"
+        case .failed:   return "Failed"
+        }
+    }
+    
+    var remark: String {
+        switch self {
+        case .ready:    return ""
+        case .loading:  return ""
+        case .success(let compress):
+            if compress == 0 {
+                return "Unknown compression"
+            } else {
+                return String(format: "%.1f%%", compress * 100)
+            }
+        case .failed(let error):   return error.localizedDescription
         }
     }
 }

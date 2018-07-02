@@ -7,8 +7,6 @@
 //
 
 import Cocoa
-
-let ApiKey = "HhB1SGxK3y6QnT5TaXiOp-hhnoj6H9-z"
 let Api = "https://api.tinify.com/shrink"
 
 class ViewController: NSViewController {
@@ -74,6 +72,12 @@ class ViewController: NSViewController {
             return
         }
         
+        let apiKey = keyInputField.stringValue
+        guard !apiKey.isEmpty else {
+            keyInputField.becomeFirstResponder()
+            return
+        }
+        
         toggleLoading(isOn: true)
         
         var count = 0
@@ -82,10 +86,14 @@ class ViewController: NSViewController {
         
         flatItems.forEach { item in
             self.updateStatus(.loading, for: item)
-            self.processFile(item: item) { (item, error) in
+            self.processFile(item: item) { (item, compress, error) in
                 count += 1
                 
-                self.updateStatus(.finished(error: error), for: item)
+                if let err = error {
+                    self.updateStatus(.failed(error: err), for: item)
+                } else {
+                    self.updateStatus(.success(compress: compress), for: item)
+                }
                 self.statusLabel.stringValue = "\(count) / \(total)"
                 self.progressBar.doubleValue = Double(count) / Double(total)
                 if count >= total {
@@ -101,6 +109,7 @@ class ViewController: NSViewController {
 //        statusLabel.isHidden = !isOn
         startButton.isEnabled = !isOn
         openButton.isEnabled = !isOn
+        keyInputField.isEnabled = !isOn
     }
     
     func updateStatus(_ status: ItemStatus, for item: Item) {
@@ -162,6 +171,16 @@ extension ViewController: NSOutlineViewDelegate {
                 textField?.stringValue = ""
             }
             return view
+        } else if tableColumn?.identifier.rawValue == "Mark" {
+            let view = outlineView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "MarkCell"), owner: nil) as! NSTableCellView
+            let textField = view.textField
+            if let i = item as? Item, !i.isExpandable {
+                textField?.stringValue = i.status.remark
+                textField?.textColor = i.status.color
+            } else {
+                textField?.stringValue = ""
+            }
+            return view
         } else {
             return nil
         }
@@ -180,22 +199,10 @@ extension ViewController: NSOutlineViewDelegate {
 }
 
 extension ViewController {
-    func processFile(item: Item, completion: @escaping (Item, Error?) -> ()) {
+    func processFile(item: Item, completion: @escaping (Item, Double, Error?) -> ()) {
         
-        let rand =  Int(arc4random_uniform(UInt32(5)))
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + TimeInterval(rand)) {
-//            completion(item, nil)
-            completion(item, NSError(domain: "dfaf.com", code: 121, userInfo: nil))
-        }
-        return
-        
-        let key = keyInputField.stringValue
-        guard !key.isEmpty else {
-            keyInputField.becomeFirstResponder()
-            return
-        }
-        
-        let token = "api:\(ApiKey)".data(using: .utf8)!
+        let apiKey = keyInputField.stringValue
+        let token = "api:\(apiKey)".data(using: .utf8)!
         let authorization = "Basic \(token.base64EncodedString())"
         
         let headers = [
@@ -224,19 +231,22 @@ extension ViewController {
                                 do {
                                     let _ = try FileManager.default.replaceItemAt(fileUrl, withItemAt: localUrl)
                                     
+                                    var compress: Double = 0
                                     if let ratio = output["ratio"] as? Double {
-                                        print("Finish file: \(fileUrl). Reduced size: \(1 - ratio)")
+                                        compress = 1 - ratio
+                                        print("Finish file: \(fileUrl). Reduced size: \(compress)")
+                                        
                                     } else {
                                         print("Finish file: \(fileUrl)")
                                     }
                                     DispatchQueue.main.async {
-                                        completion(item, nil)
+                                        completion(item, compress, nil)
                                     }
                                     
                                 } catch {
                                     print("error while write file: \(fileUrl)")
                                     DispatchQueue.main.async {
-                                        completion(item, error)
+                                        completion(item, 0, error)
                                     }
                                 }
                             }
@@ -245,14 +255,14 @@ extension ViewController {
                     }
                 } catch {
                     DispatchQueue.main.async {
-                        completion(item, error)
+                        completion(item, 0, error)
                     }
                 }
                 
             } else {
                 print("error upload file: \(fileUrl)")
                 DispatchQueue.main.async {
-                    completion(item, error)
+                    completion(item, 0, error)
                 }
             }
         }
