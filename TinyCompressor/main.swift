@@ -10,7 +10,7 @@ import Foundation
 
 let ApiKey = "HhB1SGxK3y6QnT5TaXiOp-hhnoj6H9-z"
 let Api = "https://api.tinify.com/shrink"
-let rootDirectory = "/Users/HocTran/Desktop/Assets.xcassets"
+let rootDirectory = "/Users/HocTran/Downloads/chaqwa_icon_temp/ios/AppIcon.appiconset"
 
 let fileManager = FileManager.default
 
