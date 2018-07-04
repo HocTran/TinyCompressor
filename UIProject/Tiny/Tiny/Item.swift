@@ -63,6 +63,12 @@ class Item {
     var isExpandable: Bool {
         return children != nil
     }
+    
+    static let allowTypes: [String] = [
+        "jpg", "JPG", "Jpg",
+        "jpeg", "JPEG", "Jpeg",
+        "png", "PNG", "Png"
+    ]
 }
 
 extension Item {
@@ -95,7 +101,7 @@ extension Item {
         var result = [Item]()
         if !isExpandable {
             let ext = fileUrl.pathExtension.lowercased()
-            if ext == "jpg" || ext == "jpeg" || ext == "png" {
+            if Item.allowTypes.contains(ext) {
                 result += [self]
             }
         } else if let children = self.children {

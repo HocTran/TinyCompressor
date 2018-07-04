@@ -57,11 +57,7 @@ class ViewController: NSViewController {
         panel.canChooseFiles = true
         panel.canChooseDirectories = true
         panel.allowsMultipleSelection = true
-        panel.allowedFileTypes = [
-            "jpg", "JPG", "Jpg",
-            "jpeg", "JPEG", "Jpeg",
-            "png", "PNG", "Png"
-        ]
+        panel.allowedFileTypes = Item.allowTypes
         panel.allowsOtherFileTypes = false
         
         panel.beginSheetModal(for: window) { (result) in
