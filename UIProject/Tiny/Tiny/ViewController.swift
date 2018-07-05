@@ -25,6 +25,12 @@ class ViewController: NSViewController {
 //        return session
 //    }
     
+    lazy var taskQueue: OperationQueue = {
+        let q = OperationQueue()
+        q.maxConcurrentOperationCount = 3
+        return q
+    }()
+    
     var items = [Item]() {
         didSet {
             items.forEach {
@@ -75,35 +81,36 @@ class ViewController: NSViewController {
             return
         }
         
-        let apiKey = keyInputField.stringValue
-        guard !apiKey.isEmpty else {
-            keyInputField.becomeFirstResponder()
-            return
-        }
+//        let apiKey = keyInputField.stringValue
+//        guard !apiKey.isEmpty else {
+//            keyInputField.becomeFirstResponder()
+//            return
+//        }
         
-        toggleLoading(isOn: true)
+//        toggleLoading(isOn: true)
         
         var count = 0
         self.statusLabel.stringValue = "\(count) / \(total)"
         self.progressBar.doubleValue = 0
         
         flatItems.forEach { item in
-            self.updateStatus(.loading, for: item)
-            self.processFile(item: item) { (item, compress, error) in
-                count += 1
-                
-                if let err = error {
-                    self.updateStatus(.failed(error: err), for: item)
-                } else {
-                    self.updateStatus(.success(compress: compress), for: item)
-                }
-                self.statusLabel.stringValue = "\(count) / \(total)"
-                self.progressBar.doubleValue = Double(count) / Double(total)
-                if count >= total {
-                    self.statusLabel.stringValue = "Finished!"
-                    self.toggleLoading(isOn: false)
-                }
-            }
+//            self.updateStatus(.loading, for: item)
+//            self.processFile(item: item) { (item, compress, error) in
+//                count += 1
+//
+//                if let err = error {
+//                    self.updateStatus(.failed(error: err), for: item)
+//                } else {
+//                    self.updateStatus(.success(compress: compress), for: item)
+//                }
+//                self.statusLabel.stringValue = "\(count) / \(total)"
+//                self.progressBar.doubleValue = Double(count) / Double(total)
+//                if count >= total {
+//                    self.statusLabel.stringValue = "Finished!"
+//                    self.toggleLoading(isOn: false)
+//                }
+//            }
+            self.testProcessFile(item: item)
         }
     }
     
@@ -271,5 +278,27 @@ extension ViewController {
         }
         
         uploadTask.resume()
+    }
+    
+    func testProcessFile(item: Item) -> ItemOperation {
+        let op = ItemOperation(item: item)
+        op.change = { [unowned self] item, status in
+            let itemStatus: ItemStatus!
+            switch status {
+            case .isReady:
+                itemStatus = .ready
+            case .isExecuting:
+                itemStatus = .loading
+            case .isFinished:
+                itemStatus = .success(compress: 0.5)
+            default:
+                itemStatus = .ready
+            }
+            DispatchQueue.main.async {
+                self.updateStatus(itemStatus, for: item)
+            }
+        }
+        taskQueue.addOperation(op)
+        return op
     }
 }
