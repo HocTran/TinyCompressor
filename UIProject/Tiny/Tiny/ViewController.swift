@@ -81,36 +81,42 @@ class ViewController: NSViewController {
             return
         }
         
-//        let apiKey = keyInputField.stringValue
-//        guard !apiKey.isEmpty else {
-//            keyInputField.becomeFirstResponder()
-//            return
-//        }
+        let apiKey = keyInputField.stringValue
+        guard !apiKey.isEmpty else {
+            keyInputField.becomeFirstResponder()
+            return
+        }
         
-//        toggleLoading(isOn: true)
+        toggleLoading(isOn: true)
         
         var count = 0
         self.statusLabel.stringValue = "\(count) / \(total)"
         self.progressBar.doubleValue = 0
-        
+
         flatItems.forEach { item in
-//            self.updateStatus(.loading, for: item)
-//            self.processFile(item: item) { (item, compress, error) in
-//                count += 1
-//
-//                if let err = error {
-//                    self.updateStatus(.failed(error: err), for: item)
-//                } else {
-//                    self.updateStatus(.success(compress: compress), for: item)
-//                }
-//                self.statusLabel.stringValue = "\(count) / \(total)"
-//                self.progressBar.doubleValue = Double(count) / Double(total)
-//                if count >= total {
-//                    self.statusLabel.stringValue = "Finished!"
-//                    self.toggleLoading(isOn: false)
-//                }
-//            }
-            self.testProcessFile(item: item)
+            let op = ItemOperation(item: item, apiKey: apiKey)
+            op.change = { [unowned self] item, status in
+                let isFinished = status.isFinished
+                
+                item.status = status
+                DispatchQueue.main.async {
+                    self.reload(item: item)
+                    if isFinished {
+                        count += 1
+                        
+                        let statusCount = "\(count) / \(total)"
+                        let progress = Double(count) / Double(total)
+                        let allFinished = count >= total
+                        self.statusLabel.stringValue = statusCount
+                        self.progressBar.doubleValue = progress
+                        if allFinished {
+                            self.toggleLoading(isOn: false)
+                            self.statusLabel.stringValue = "Finished!"
+                        }
+                    }
+                }
+            }
+            taskQueue.addOperation(op)
         }
     }
     
@@ -122,8 +128,7 @@ class ViewController: NSViewController {
         keyInputField.isEnabled = !isOn
     }
     
-    func updateStatus(_ status: ItemStatus, for item: Item) {
-        item.status = status
+    func reload(item: Item) {
         let idx = self.outlineView.row(forItem: item)
         if let rowView = self.outlineView.rowView(atRow: idx, makeIfNecessary: false) {
             if item.isExpandable {
@@ -206,99 +211,4 @@ extension ViewController: NSOutlineViewDelegate {
         }
     }
     
-}
-
-extension ViewController {
-    func processFile(item: Item, completion: @escaping (Item, Double, Error?) -> ()) {
-        
-        let apiKey = keyInputField.stringValue
-        let token = "api:\(apiKey)".data(using: .utf8)!
-        let authorization = "Basic \(token.base64EncodedString())"
-        
-        let headers = [
-            "authorization": authorization,
-            "content-type": "application/x-www-form-urlencoded",
-            "cache-control": "no-cache"
-        ]
-        
-        var request = URLRequest(url: URL(string: Api)!,
-                                 cachePolicy: .useProtocolCachePolicy,
-                                 timeoutInterval: 10.0)
-        
-        request.httpMethod = "POST"
-        request.allHTTPHeaderFields = headers
-        
-        let session = URLSession.shared
-        let fileUrl = item.fileUrl
-        let uploadTask = session.uploadTask(with: request, fromFile: fileUrl) { (data, response, error) -> Void in
-            if let data = data {
-                do {
-                    if let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String : Any], let output = json["output"] as? [String : Any], let resultUrl = output["url"] as? String, let downloadUrl = URL(string: resultUrl) {
-                        
-                        let downloadTask = session.downloadTask(with: downloadUrl) { (localUrl, reponse, error) in
-                            if let localUrl = localUrl {
-                                //copy result to original url
-                                do {
-                                    let _ = try FileManager.default.replaceItemAt(fileUrl, withItemAt: localUrl)
-                                    
-                                    var compress: Double = 0
-                                    if let ratio = output["ratio"] as? Double {
-                                        compress = 1 - ratio
-                                        print("Finish file: \(fileUrl). Reduced size: \(compress)")
-                                        
-                                    } else {
-                                        print("Finish file: \(fileUrl)")
-                                    }
-                                    DispatchQueue.main.async {
-                                        completion(item, compress, nil)
-                                    }
-                                    
-                                } catch {
-                                    print("error while write file: \(fileUrl)")
-                                    DispatchQueue.main.async {
-                                        completion(item, 0, error)
-                                    }
-                                }
-                            }
-                        }
-                        downloadTask.resume()
-                    }
-                } catch {
-                    DispatchQueue.main.async {
-                        completion(item, 0, error)
-                    }
-                }
-                
-            } else {
-                print("error upload file: \(fileUrl)")
-                DispatchQueue.main.async {
-                    completion(item, 0, error)
-                }
-            }
-        }
-        
-        uploadTask.resume()
-    }
-    
-    func testProcessFile(item: Item) -> ItemOperation {
-        let op = ItemOperation(item: item)
-        op.change = { [unowned self] item, status in
-            let itemStatus: ItemStatus!
-            switch status {
-            case .isReady:
-                itemStatus = .ready
-            case .isExecuting:
-                itemStatus = .loading
-            case .isFinished:
-                itemStatus = .success(compress: 0.5)
-            default:
-                itemStatus = .ready
-            }
-            DispatchQueue.main.async {
-                self.updateStatus(itemStatus, for: item)
-            }
-        }
-        taskQueue.addOperation(op)
-        return op
-    }
 }

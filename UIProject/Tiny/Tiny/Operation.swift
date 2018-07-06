@@ -8,76 +8,133 @@
 
 import Cocoa
 
-class BaseOperation: Operation {
-    private var backing_executing : Bool
-    override var isExecuting : Bool {
-        get { return backing_executing }
-        set {
-            willChangeValue(forKey: "isExecuting")
-            backing_executing = newValue
-            didChangeValue(forKey: "isExecuting")
-        }
-    }
-    
-    private var backing_finished : Bool
-    override var isFinished : Bool {
-        get { return backing_finished }
-        set {
-            willChangeValue(forKey: "isFinished")
-            backing_finished = newValue
-            didChangeValue(forKey: "isFinished")
-        }
-    }
-    
-    override init() {
-        backing_executing = false
-        backing_finished = false
-        super.init()
-    }
-    
-    func completeOperation() {
-        isExecuting = false
-        isFinished = true
-    }
-}
-
-class ItemOperation: BaseOperation {
-//    private var _context = 0
-    enum Status: String {
-        case isReady
-        case isCancelled
-        case isExecuting
-        case isFinished
-        
-        static var all: [Status] = [.isReady, .isExecuting, .isFinished]
-    }
-    
+class ItemOperation: Operation {
     private var item: Item!
-    var change:((Item, Status) -> Void)?
-    init(item: Item) {
+    private var apiKey: String!
+    private var tasks = [URLSessionTask]()
+    var change:((Item, ItemStatus) -> Void)?
+    
+    private var compress: Double?
+    private var error: Error?
+    
+    init(item: Item, apiKey: String) {
         super.init()
         self.item = item
-        Status.all.forEach {
-            self.addObserver(self, forKeyPath: $0.rawValue, options: [.initial, .new], context: nil)
-        }
-    }
-    override func start() {
-        super.start()
-        isExecuting = true
-    }
-    override func main() {
-        if isCancelled {
-            completeOperation()
-            return
-        }
-        DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) {
-            self.completeOperation()
-        }
+        self.apiKey = apiKey
     }
     
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if let key = keyPath, let status = Status(rawValue: key), let v = change?[.newKey] as? Bool, v {
-            self.change?(item, status)
+    override func cancel() {
+        tasks.forEach {
+            $0.cancel()
+        }
+        super.cancel()
+    }
+    
+    override func main() {
+        if isCancelled {
+            return
+        }
+        
+        self.change?(self.item, .loading)
+        
+        let randomNum = Int(arc4random_uniform(2))
+        let mSema = DispatchSemaphore(value: 0)
+        DispatchQueue.global().asyncAfter(deadline: .now() + TimeInterval(randomNum)) {
+            mSema.signal()
+        }
+        
+        mSema.wait()
+        if randomNum % 2 == 0 {
+            self.error = NSError(domain: "com.error.test", code: 0, userInfo: nil)
+        }
+        
+        if let error = self.error {
+            self.change?(self.item, .failed(error: error))
+        } else {
+            self.change?(self.item, .success(compress: self.compress))
+        }
+        
+        return
+        
+        let apiKey = self.apiKey!
+        let token = "api:\(apiKey)".data(using: .utf8)!
+        let authorization = "Basic \(token.base64EncodedString())"
+        
+        let headers = [
+            "authorization": authorization,
+            "content-type": "application/x-www-form-urlencoded",
+            "cache-control": "no-cache"
+        ]
+        
+        var request = URLRequest(url: URL(string: Api)!,
+                                 cachePolicy: .useProtocolCachePolicy,
+                                 timeoutInterval: 30.0)
+        
+        request.httpMethod = "POST"
+        request.allHTTPHeaderFields = headers
+        
+        let session = URLSession.shared
+        let fileUrl = item.fileUrl
+        
+        let sema = DispatchSemaphore(value: 0)
+        let uploadTask = session.uploadTask(with: request, fromFile: fileUrl) { (data, response, error) -> Void in
+            if self.isCancelled {
+                return
+            }
+            
+            if let data = data {
+                do {
+                    if let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String : Any], let output = json["output"] as? [String : Any], let resultUrl = output["url"] as? String, let downloadUrl = URL(string: resultUrl) {
+                        
+                        let downloadTask = session.downloadTask(with: downloadUrl) { (localUrl, reponse, error) in
+                            if self.isCancelled {
+                                return
+                            }
+                            
+                            if let localUrl = localUrl {
+                                //copy result to original url
+                                do {
+                                    let _ = try FileManager.default.replaceItemAt(fileUrl, withItemAt: localUrl)
+                                    
+                                    var compress: Double?
+                                    if let ratio = output["ratio"] as? Double {
+                                        compress = 1 - ratio
+                                        print("Finish file: \(fileUrl). Reduced size: \(compress!)")
+                                        
+                                    } else {
+                                        print("Finish file: \(fileUrl)")
+                                    }
+                                    
+                                    self.compress = compress
+                                    sema.signal()
+                                    
+                                } catch {
+                                    print("error while write file: \(fileUrl)")
+                                    self.error = error
+                                    sema.signal()
+                                }
+                            }
+                        }
+                        downloadTask.resume()
+                    }
+                } catch {
+                    self.error = error
+                    sema.signal()
+                }
+                
+            } else {
+                print("error upload file: \(fileUrl)")
+                self.error = error
+            }
+        }
+        
+        uploadTask.resume()
+        sema.wait()
+        
+        if let error = self.error {
+            self.change?(self.item, .failed(error: error))
+        } else {
+            self.change?(self.item, .success(compress: self.compress))
         }
     }
 }

@@ -60,9 +60,9 @@
 				1534D37620E9CF8D00610EE0 /* AppDelegate.swift */,
 				1534D37820E9CF8D00610EE0 /* ViewController.swift */,
 				15B5875020ECDFAE006FCEF7 /* Operation.swift */,
+				1534D38620E9D41B00610EE0 /* Item.swift */,
 				1534D37A20E9CF8E00610EE0 /* Assets.xcassets */,
 				1534D37C20E9CF8E00610EE0 /* Main.storyboard */,
-				1534D38620E9D41B00610EE0 /* Item.swift */,
 				1534D37F20E9CF8E00610EE0 /* Info.plist */,
 				1534D38020E9CF8E00610EE0 /* Tiny.entitlements */,
 			);

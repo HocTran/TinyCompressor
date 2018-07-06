@@ -11,7 +11,7 @@ import Cocoa
 enum ItemStatus {
     case ready
     case loading
-    case success(compress: Double)
+    case success(compress: Double?)
     case failed(error: Error)
     
     var color: NSColor {
@@ -37,12 +37,22 @@ enum ItemStatus {
         case .ready:    return ""
         case .loading:  return ""
         case .success(let compress):
-            if compress == 0 {
-                return "Unknown compression"
+            if let comp = compress {
+                return String(format: "%.1f%%", comp * 100)
             } else {
-                return String(format: "%.1f%%", compress * 100)
+                return "Unknown compression"
             }
         case .failed(let error):   return error.localizedDescription
+        }
+    }
+    
+    var isFinished: Bool {
+        if case .success(_) = self {
+            return true
+        } else if case .failed(_) = self {
+            return true
+        } else {
+            return false
         }
     }
 }
