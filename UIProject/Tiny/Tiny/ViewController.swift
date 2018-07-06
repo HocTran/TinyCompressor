@@ -118,6 +118,7 @@ class ViewController: NSViewController {
             }
             taskQueue.addOperation(op)
         }
+        //TODO: change to using done block with item operations as dependencies
     }
     
     func toggleLoading(isOn: Bool) {
@@ -211,4 +212,59 @@ extension ViewController: NSOutlineViewDelegate {
         }
     }
     
+}
+
+extension ViewController: NSMenuDelegate {
+    func menuNeedsUpdate(_ menu: NSMenu) {
+        let row = outlineView.clickedRow
+        menu.removeAllItems()
+        if row < 0 {
+            print("Wrong row")
+        } else {    
+            menuItems(at: row).forEach { menu.addItem($0) }
+        }
+    }
+    
+    func menuItems(at row: Int) -> [NSMenuItem] {
+        var menuItems = [NSMenuItem]()
+        
+        if let item = outlineView.item(atRow: row) as? Item {
+            let revealItem = NSMenuItem(title: "Reveal in Finder...", action: #selector(ViewController.menuRevealFinderSelected(_:)), keyEquivalent: "")
+            menuItems.append(revealItem)
+            
+            if case .failed(_) = item.status {
+                let retryItem = NSMenuItem(title: "Retry", action: #selector(ViewController.menuRetrySelected(_:)), keyEquivalent: "")
+                menuItems.append(retryItem)
+            }
+        }
+        
+        return menuItems
+    }
+    
+    @objc func menuRevealFinderSelected(_ sender: NSMenuItem) {
+        let row = outlineView.clickedRow
+        if let item = outlineView.item(atRow: row) as? Item {
+            NSWorkspace.shared.selectFile(item.fileUrl.path, inFileViewerRootedAtPath: item.fileUrl.deletingLastPathComponent().path)
+        }
+    }
+    
+    @objc func menuRetrySelected(_ sender: NSMenuItem) {
+        let row = outlineView.clickedRow
+        if let item = outlineView.item(atRow: row) as? Item {
+            
+            let apiKey = keyInputField.stringValue
+            guard !apiKey.isEmpty else {
+                keyInputField.becomeFirstResponder()
+                return
+            }
+            let op = ItemOperation(item: item, apiKey: apiKey)
+            op.change = { [unowned self] item, status in
+                item.status = status
+                DispatchQueue.main.async {
+                    self.reload(item: item)
+                }
+            }
+            taskQueue.addOperation(op)
+        }
+    }
 }

@@ -239,6 +239,7 @@
                                             <connections>
                                                 <outlet property="dataSource" destination="XfG-lQ-9wD" id="Wyh-hA-cb3"/>
                                                 <outlet property="delegate" destination="XfG-lQ-9wD" id="x5y-p6-Qm7"/>
+                                                <outlet property="menu" destination="PGy-qU-4wW" id="LIx-ub-68K"/>
                                             </connections>
                                         </outlineView>
                                     </subviews>
@@ -367,6 +368,16 @@
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <menu id="PGy-qU-4wW">
+                    <items>
+                        <menuItem title="Reveal in Finder..." id="0pP-Xm-DaR">
+                            <modifierMask key="keyEquivalentModifierMask"/>
+                        </menuItem>
+                    </items>
+                    <connections>
+                        <outlet property="delegate" destination="XfG-lQ-9wD" id="r8D-op-Gsi"/>
+                    </connections>
+                </menu>
             </objects>
             <point key="canvasLocation" x="116" y="654.5"/>
         </scene>
