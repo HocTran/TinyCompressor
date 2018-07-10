@@ -25,6 +25,12 @@ class ViewController: NSViewController {
 //        return session
 //    }
     
+    lazy var taskQueue: OperationQueue = {
+        let q = OperationQueue()
+        q.maxConcurrentOperationCount = 3
+        return q
+    }()
+    
     var items = [Item]() {
         didSet {
             items.forEach {
@@ -86,25 +92,33 @@ class ViewController: NSViewController {
         var count = 0
         self.statusLabel.stringValue = "\(count) / \(total)"
         self.progressBar.doubleValue = 0
-        
+
         flatItems.forEach { item in
-            self.updateStatus(.loading, for: item)
-            self.processFile(item: item) { (item, compress, error) in
-                count += 1
+            let op = ItemOperation(item: item, apiKey: apiKey)
+            op.change = { [unowned self] item, status in
+                let isFinished = status.isFinished
                 
-                if let err = error {
-                    self.updateStatus(.failed(error: err), for: item)
-                } else {
-                    self.updateStatus(.success(compress: compress), for: item)
-                }
-                self.statusLabel.stringValue = "\(count) / \(total)"
-                self.progressBar.doubleValue = Double(count) / Double(total)
-                if count >= total {
-                    self.statusLabel.stringValue = "Finished!"
-                    self.toggleLoading(isOn: false)
+                item.status = status
+                DispatchQueue.main.async {
+                    self.reload(item: item)
+                    if isFinished {
+                        count += 1
+                        
+                        let statusCount = "\(count) / \(total)"
+                        let progress = Double(count) / Double(total)
+                        let allFinished = count >= total
+                        self.statusLabel.stringValue = statusCount
+                        self.progressBar.doubleValue = progress
+                        if allFinished {
+                            self.toggleLoading(isOn: false)
+                            self.statusLabel.stringValue = "Finished!"
+                        }
+                    }
                 }
             }
+            taskQueue.addOperation(op)
         }
+        //TODO: change to using done block with item operations as dependencies
     }
     
     func toggleLoading(isOn: Bool) {
@@ -115,8 +129,7 @@ class ViewController: NSViewController {
         keyInputField.isEnabled = !isOn
     }
     
-    func updateStatus(_ status: ItemStatus, for item: Item) {
-        item.status = status
+    func reload(item: Item) {
         let idx = self.outlineView.row(forItem: item)
         if let rowView = self.outlineView.rowView(atRow: idx, makeIfNecessary: false) {
             if item.isExpandable {
@@ -201,75 +214,57 @@ extension ViewController: NSOutlineViewDelegate {
     
 }
 
-extension ViewController {
-    func processFile(item: Item, completion: @escaping (Item, Double, Error?) -> ()) {
+extension ViewController: NSMenuDelegate {
+    func menuNeedsUpdate(_ menu: NSMenu) {
+        let row = outlineView.clickedRow
+        menu.removeAllItems()
+        if row < 0 {
+            print("Wrong row")
+        } else {    
+            menuItems(at: row).forEach { menu.addItem($0) }
+        }
+    }
+    
+    func menuItems(at row: Int) -> [NSMenuItem] {
+        var menuItems = [NSMenuItem]()
         
-        let apiKey = keyInputField.stringValue
-        let token = "api:\(apiKey)".data(using: .utf8)!
-        let authorization = "Basic \(token.base64EncodedString())"
-        
-        let headers = [
-            "authorization": authorization,
-            "content-type": "application/x-www-form-urlencoded",
-            "cache-control": "no-cache"
-        ]
-        
-        var request = URLRequest(url: URL(string: Api)!,
-                                 cachePolicy: .useProtocolCachePolicy,
-                                 timeoutInterval: 10.0)
-        
-        request.httpMethod = "POST"
-        request.allHTTPHeaderFields = headers
-        
-        let session = URLSession.shared
-        let fileUrl = item.fileUrl
-        let uploadTask = session.uploadTask(with: request, fromFile: fileUrl) { (data, response, error) -> Void in
-            if let data = data {
-                do {
-                    if let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String : Any], let output = json["output"] as? [String : Any], let resultUrl = output["url"] as? String, let downloadUrl = URL(string: resultUrl) {
-                        
-                        let downloadTask = session.downloadTask(with: downloadUrl) { (localUrl, reponse, error) in
-                            if let localUrl = localUrl {
-                                //copy result to original url
-                                do {
-                                    let _ = try FileManager.default.replaceItemAt(fileUrl, withItemAt: localUrl)
-                                    
-                                    var compress: Double = 0
-                                    if let ratio = output["ratio"] as? Double {
-                                        compress = 1 - ratio
-                                        print("Finish file: \(fileUrl). Reduced size: \(compress)")
-                                        
-                                    } else {
-                                        print("Finish file: \(fileUrl)")
-                                    }
-                                    DispatchQueue.main.async {
-                                        completion(item, compress, nil)
-                                    }
-                                    
-                                } catch {
-                                    print("error while write file: \(fileUrl)")
-                                    DispatchQueue.main.async {
-                                        completion(item, 0, error)
-                                    }
-                                }
-                            }
-                        }
-                        downloadTask.resume()
-                    }
-                } catch {
-                    DispatchQueue.main.async {
-                        completion(item, 0, error)
-                    }
-                }
-                
-            } else {
-                print("error upload file: \(fileUrl)")
-                DispatchQueue.main.async {
-                    completion(item, 0, error)
-                }
+        if let item = outlineView.item(atRow: row) as? Item {
+            let revealItem = NSMenuItem(title: "Reveal in Finder...", action: #selector(ViewController.menuRevealFinderSelected(_:)), keyEquivalent: "")
+            menuItems.append(revealItem)
+            
+            if case .failed(_) = item.status {
+                let retryItem = NSMenuItem(title: "Retry", action: #selector(ViewController.menuRetrySelected(_:)), keyEquivalent: "")
+                menuItems.append(retryItem)
             }
         }
         
-        uploadTask.resume()
+        return menuItems
+    }
+    
+    @objc func menuRevealFinderSelected(_ sender: NSMenuItem) {
+        let row = outlineView.clickedRow
+        if let item = outlineView.item(atRow: row) as? Item {
+            NSWorkspace.shared.selectFile(item.fileUrl.path, inFileViewerRootedAtPath: item.fileUrl.deletingLastPathComponent().path)
+        }
+    }
+    
+    @objc func menuRetrySelected(_ sender: NSMenuItem) {
+        let row = outlineView.clickedRow
+        if let item = outlineView.item(atRow: row) as? Item {
+            
+            let apiKey = keyInputField.stringValue
+            guard !apiKey.isEmpty else {
+                keyInputField.becomeFirstResponder()
+                return
+            }
+            let op = ItemOperation(item: item, apiKey: apiKey)
+            op.change = { [unowned self] item, status in
+                item.status = status
+                DispatchQueue.main.async {
+                    self.reload(item: item)
+                }
+            }
+            taskQueue.addOperation(op)
+        }
     }
 }
