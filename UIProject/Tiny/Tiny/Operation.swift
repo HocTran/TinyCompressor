@@ -37,6 +37,7 @@ class ItemOperation: Operation {
         
         self.change?(self.item, .loading)
         
+        /*test ->
         let randomNum = Int(arc4random_uniform(2))
         let mSema = DispatchSemaphore(value: 0)
         DispatchQueue.global().asyncAfter(deadline: .now() + TimeInterval(randomNum)) {
@@ -55,6 +56,7 @@ class ItemOperation: Operation {
         }
         
         return
+        <- */
         
         let apiKey = self.apiKey!
         let token = "api:\(apiKey)".data(using: .utf8)!
@@ -82,40 +84,56 @@ class ItemOperation: Operation {
                 return
             }
             
-            if let data = data {
+            if let httpRes = response as? HTTPURLResponse, httpRes.statusCode == 401 {
+                self.error = NSError(domain: "Unauthorized", code: 401, userInfo: nil)
+                sema.signal()
+            } else if let error = error {
+                self.error = error
+                sema.signal()
+            } else if let data = data {
                 do {
-                    if let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String : Any], let output = json["output"] as? [String : Any], let resultUrl = output["url"] as? String, let downloadUrl = URL(string: resultUrl) {
-                        
-                        let downloadTask = session.downloadTask(with: downloadUrl) { (localUrl, reponse, error) in
-                            if self.isCancelled {
-                                return
-                            }
-                            
-                            if let localUrl = localUrl {
-                                //copy result to original url
-                                do {
-                                    let _ = try FileManager.default.replaceItemAt(fileUrl, withItemAt: localUrl)
-                                    
-                                    var compress: Double?
-                                    if let ratio = output["ratio"] as? Double {
-                                        compress = 1 - ratio
-                                        print("Finish file: \(fileUrl). Reduced size: \(compress!)")
+                    if let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String : Any] {
+                        if let output = json["output"] as? [String : Any], let resultUrl = output["url"] as? String, let downloadUrl = URL(string: resultUrl) {
+                            let downloadTask = session.downloadTask(with: downloadUrl) { (localUrl, reponse, error) in
+                                if self.isCancelled {
+                                    return
+                                }
+                                
+                                if let localUrl = localUrl {
+                                    //copy result to original url
+                                    do {
+                                        let _ = try FileManager.default.replaceItemAt(fileUrl, withItemAt: localUrl)
                                         
-                                    } else {
-                                        print("Finish file: \(fileUrl)")
+                                        var compress: Double?
+                                        if let ratio = output["ratio"] as? Double {
+                                            compress = 1 - ratio
+                                            print("Finish file: \(fileUrl). Reduced size: \(compress!)")
+                                            
+                                        } else {
+                                            print("Finish file: \(fileUrl)")
+                                        }
+                                        
+                                        self.compress = compress
+                                        sema.signal()
+                                        
+                                    } catch {
+                                        print("error while write file: \(fileUrl)")
+                                        self.error = error
+                                        sema.signal()
                                     }
-                                    
-                                    self.compress = compress
-                                    sema.signal()
-                                    
-                                } catch {
-                                    print("error while write file: \(fileUrl)")
-                                    self.error = error
-                                    sema.signal()
                                 }
                             }
+                            downloadTask.resume()
+                        } else if let msg = json["error"] as? String {
+                            self.error = NSError(domain: msg, code: 0, userInfo: nil)
+                            sema.signal()
+                        } else {
+                            self.error = NSError(domain: "unknown error", code: 0, userInfo: nil)
+                            sema.signal()
                         }
-                        downloadTask.resume()
+                    } else {
+                        self.error = NSError(domain: "unknown error", code: 0, userInfo: nil)
+                        sema.signal()
                     }
                 } catch {
                     self.error = error
