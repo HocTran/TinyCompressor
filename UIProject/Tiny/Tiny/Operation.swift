@@ -71,7 +71,7 @@ class ItemOperation: Operation {
         
         var request = URLRequest(url: URL(string: Api)!,
                                  cachePolicy: .useProtocolCachePolicy,
-                                 timeoutInterval: 30.0)
+                                 timeoutInterval: 90.0)
         
         request.httpMethod = "POST"
         request.allHTTPHeaderFields = headers
