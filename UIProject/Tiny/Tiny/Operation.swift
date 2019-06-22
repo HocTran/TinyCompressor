@@ -32,6 +32,7 @@ class ItemOperation: Operation {
     
     override func main() {
         if isCancelled {
+            self.change?(self.item, .ready)
             return
         }
         
@@ -81,6 +82,7 @@ class ItemOperation: Operation {
         let sema = DispatchSemaphore(value: 0)
         let uploadTask = session.uploadTask(with: request, fromFile: fileUrl) { (data, response, error) -> Void in
             if self.isCancelled {
+                sema.signal()
                 return
             }
             
@@ -96,6 +98,7 @@ class ItemOperation: Operation {
                         if let output = json["output"] as? [String : Any], let resultUrl = output["url"] as? String, let downloadUrl = URL(string: resultUrl) {
                             let downloadTask = session.downloadTask(with: downloadUrl) { (localUrl, reponse, error) in
                                 if self.isCancelled {
+                                    sema.signal()
                                     return
                                 }
                                 
@@ -143,11 +146,17 @@ class ItemOperation: Operation {
             } else {
                 print("error upload file: \(fileUrl)")
                 self.error = error
+                sema.signal()
             }
         }
         
         uploadTask.resume()
         sema.wait()
+        
+        if isCancelled {
+            self.change?(self.item, .ready)
+            return
+        }
         
         if let error = self.error {
             self.change?(self.item, .failed(error: error))
