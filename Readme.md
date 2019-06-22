@@ -24,10 +24,14 @@ The app built rely on [TinyPng](https://tinypng.com) service.
 ## 🚀 Released
 
 **v1.0.1**
+
 - Hot-fix for syntax changes and documentation.
+- [Download](https://bitbucket.org/HocTran/tinycompressor/downloads/Tiny_v1.0.1.app.zip)
 
 **v1.0.0**
+
 - First release version.
+- [Download](https://bitbucket.org/HocTran/tinycompressor/downloads/Tiny_v1.0.0.app.zip)
 
 ## How to use
 
