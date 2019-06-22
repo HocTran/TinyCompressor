@@ -27,7 +27,7 @@ class ViewController: NSViewController {
     
     lazy var taskQueue: OperationQueue = {
         let q = OperationQueue()
-        q.maxConcurrentOperationCount = 3
+        q.maxConcurrentOperationCount = 10
         return q
     }()
     
