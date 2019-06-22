@@ -101,6 +101,7 @@
 				TargetAttributes = {
 					1534D37220E9CF8D00610EE0 = {
 						CreatedOnToolsVersion = 9.4;
+						LastSwiftMigration = 1020;
 						SystemCapabilities = {
 							com.apple.Sandbox = {
 								enabled = 1;
@@ -294,7 +295,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.hoctran.Tiny;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -314,7 +315,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.hoctran.Tiny;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
