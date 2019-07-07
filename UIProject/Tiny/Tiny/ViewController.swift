@@ -3,7 +3,24 @@
 //  Tiny
 //
 //  Created by HocTran on 7/2/18.
-//  Copyright © 2018 Hoc Tran. All rights reserved.
+//  Copyright (c) 2018 Hoc Tran
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
 //
 
 import Cocoa
@@ -17,6 +34,7 @@ class ViewController: NSViewController {
     @IBOutlet weak var openButton: NSButton!
     @IBOutlet weak var startButton: NSButton!
     @IBOutlet weak var keyInputField: NSTextField!
+    @IBOutlet weak var rememberButton: NSButton!
     
 //    lazy var session: URLSession {
 //        let config = URLSessionConfiguration()
@@ -24,6 +42,8 @@ class ViewController: NSViewController {
 //        let session = URLSession(configuration: config)
 //        return session
 //    }
+    
+    let apiUserDefaultsKey = "ApiUserDefaultsKey"
     
     lazy var taskQueue: OperationQueue = {
         let q = OperationQueue()
@@ -46,6 +66,12 @@ class ViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        if let key = UserDefaults.standard.string(forKey: apiUserDefaultsKey) {
+            keyInputField.stringValue = key
+            rememberButton.state = .on
+        } else {
+            rememberButton.state = .off
+        }
         
         toggleLoading(isOn: false)
     }
@@ -56,6 +82,13 @@ class ViewController: NSViewController {
         }
     }
 
+    @IBAction func didPressRemember(_ sender: NSButton) {
+        
+        if sender.state == .off {
+            UserDefaults.standard.set(nil, forKey: apiUserDefaultsKey)
+        }
+    }
+    
     @IBAction func openPanel(_ sender: Any?) {
         guard let window = view.window else { return }
         
@@ -76,6 +109,11 @@ class ViewController: NSViewController {
     }
     
     @IBAction func start(_ sender: Any?) {
+        
+        if rememberButton.state == .on {
+            UserDefaults.standard.set(keyInputField.stringValue, forKey: apiUserDefaultsKey)
+        }
+        
         let total = flatItems.count
         if total == 0 {
             return

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14113"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
-        <capability name="stacking Non-gravity area distributions on NSStackView" minToolsVersion="7.0" minSystemVersion="10.11"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -98,7 +98,7 @@
         <scene sceneID="R2V-B0-nI4">
             <objects>
                 <windowController id="B8D-0N-5wS" sceneMemberID="viewController">
-                    <window key="window" title="Tiny" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA">
+                    <window key="window" title="Tiny" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="196" y="240" width="480" height="270"/>
@@ -120,17 +120,17 @@
             <objects>
                 <viewController id="XfG-lQ-9wD" customClass="ViewController" customModule="Tiny" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" wantsLayer="YES" id="m2S-Jp-Qdl">
-                        <rect key="frame" x="0.0" y="0.0" width="684" height="307"/>
+                        <rect key="frame" x="0.0" y="0.0" width="776" height="307"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YLg-b3-F9F">
-                                <rect key="frame" x="0.0" y="67" width="684" height="240"/>
+                                <rect key="frame" x="0.0" y="67" width="776" height="240"/>
                                 <clipView key="contentView" id="l0s-Lv-bbc">
-                                    <rect key="frame" x="1" y="0.0" width="682" height="239"/>
+                                    <rect key="frame" x="1" y="0.0" width="774" height="239"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="UTL-6F-QdT" viewBased="YES" indentationPerLevel="16" outlineTableColumn="7Mr-YF-PtR" id="3Fk-V8-gFM">
-                                            <rect key="frame" x="0.0" y="0.0" width="682" height="216"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="774" height="216"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -244,24 +244,24 @@
                                         </outlineView>
                                     </subviews>
                                 </clipView>
-                                <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="4oP-dR-HI2">
+                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="4oP-dR-HI2">
                                     <rect key="frame" x="1" y="254" width="478" height="15"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
-                                <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="MAJ-F1-H2Q">
+                                <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="MAJ-F1-H2Q">
                                     <rect key="frame" x="224" y="17" width="15" height="102"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <tableHeaderView key="headerView" id="UTL-6F-QdT">
-                                    <rect key="frame" x="0.0" y="0.0" width="682" height="23"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="774" height="23"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableHeaderView>
                             </scrollView>
                             <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6Vn-y7-WTF">
-                                <rect key="frame" x="8" y="8" width="668" height="51"/>
+                                <rect key="frame" x="8" y="8" width="760" height="51"/>
                                 <subviews>
                                     <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vPd-rS-djz">
-                                        <rect key="frame" x="0.0" y="29" width="668" height="22"/>
+                                        <rect key="frame" x="0.0" y="29" width="760" height="22"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3KV-Ud-gDU">
                                                 <rect key="frame" x="-2" y="3" width="80" height="17"/>
@@ -275,22 +275,34 @@
                                                 <rect key="frame" x="84" y="0.0" width="584" height="22"/>
                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Fill your TinyPNG key" drawsBackground="YES" id="qjl-Wv-6Hb">
                                                     <font key="font" metaFont="system"/>
-                                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
                                             </textField>
+                                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6dg-y4-tg4">
+                                                <rect key="frame" x="674" y="2" width="88" height="18"/>
+                                                <buttonCell key="cell" type="check" title="Remember" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="AfZ-sY-04F">
+                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                    <font key="font" metaFont="system"/>
+                                                </buttonCell>
+                                                <connections>
+                                                    <action selector="didPressRemember:" target="XfG-lQ-9wD" id="zDF-Rf-wVf"/>
+                                                </connections>
+                                            </button>
                                         </subviews>
                                         <visibilityPriorities>
+                                            <integer value="1000"/>
                                             <integer value="1000"/>
                                             <integer value="1000"/>
                                         </visibilityPriorities>
                                         <customSpacing>
                                             <real value="3.4028234663852886e+38"/>
                                             <real value="3.4028234663852886e+38"/>
+                                            <real value="3.4028234663852886e+38"/>
                                         </customSpacing>
                                     </stackView>
                                     <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="AOV-lA-Not">
-                                        <rect key="frame" x="0.0" y="0.0" width="668" height="21"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="760" height="21"/>
                                         <subviews>
                                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eL8-AC-eKJ">
                                                 <rect key="frame" x="-6" y="-7" width="73" height="32"/>
@@ -313,10 +325,10 @@
                                                 </connections>
                                             </button>
                                             <progressIndicator wantsLayer="YES" horizontalHuggingPriority="249" maxValue="1" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="7ci-cv-oKv">
-                                                <rect key="frame" x="135" y="1" width="497" height="20"/>
+                                                <rect key="frame" x="135" y="1" width="589" height="20"/>
                                             </progressIndicator>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pQv-S2-KT7">
-                                                <rect key="frame" x="638" y="2" width="32" height="17"/>
+                                                <rect key="frame" x="730" y="2" width="32" height="17"/>
                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="0 / 0" id="Tdp-xv-J8n">
                                                     <font key="font" metaFont="system"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -363,6 +375,7 @@
                         <outlet property="openButton" destination="eL8-AC-eKJ" id="I5B-RQ-Qt7"/>
                         <outlet property="outlineView" destination="3Fk-V8-gFM" id="yBF-u8-uK9"/>
                         <outlet property="progressBar" destination="7ci-cv-oKv" id="HPq-3U-pR7"/>
+                        <outlet property="rememberButton" destination="6dg-y4-tg4" id="uFC-OS-qP4"/>
                         <outlet property="startButton" destination="e8p-yv-JuS" id="j9s-Gp-Okp"/>
                         <outlet property="statusLabel" destination="pQv-S2-KT7" id="h4p-LT-NBY"/>
                     </connections>
