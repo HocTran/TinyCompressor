@@ -17,6 +17,7 @@ class ViewController: NSViewController {
     @IBOutlet weak var openButton: NSButton!
     @IBOutlet weak var startButton: NSButton!
     @IBOutlet weak var keyInputField: NSTextField!
+    @IBOutlet weak var rememberButton: NSButton!
     
 //    lazy var session: URLSession {
 //        let config = URLSessionConfiguration()
@@ -24,6 +25,8 @@ class ViewController: NSViewController {
 //        let session = URLSession(configuration: config)
 //        return session
 //    }
+    
+    let apiUserDefaultsKey = "ApiUserDefaultsKey"
     
     lazy var taskQueue: OperationQueue = {
         let q = OperationQueue()
@@ -46,6 +49,12 @@ class ViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        if let key = UserDefaults.standard.string(forKey: apiUserDefaultsKey) {
+            keyInputField.stringValue = key
+            rememberButton.state = .on
+        } else {
+            rememberButton.state = .off
+        }
         
         toggleLoading(isOn: false)
     }
@@ -56,6 +65,13 @@ class ViewController: NSViewController {
         }
     }
 
+    @IBAction func didPressRemember(_ sender: NSButton) {
+        
+        if sender.state == .off {
+            UserDefaults.standard.set(nil, forKey: apiUserDefaultsKey)
+        }
+    }
+    
     @IBAction func openPanel(_ sender: Any?) {
         guard let window = view.window else { return }
         
@@ -76,6 +92,11 @@ class ViewController: NSViewController {
     }
     
     @IBAction func start(_ sender: Any?) {
+        
+        if rememberButton.state == .on {
+            UserDefaults.standard.set(keyInputField.stringValue, forKey: apiUserDefaultsKey)
+        }
+        
         let total = flatItems.count
         if total == 0 {
             return
