@@ -8,7 +8,7 @@ The app built rely on [TinyPng](https://tinypng.com) service.
 
 - Works with PNG and JPEG format.
 - Support individual file, multiple files or fully recursive image directory.
-- Concurrent processing.
+- Concurrent processing (max 10 files).
 - Retry if any failure.
 - Colorize status and simple UI.
 - Reveal file in Finder.
@@ -17,11 +17,17 @@ The app built rely on [TinyPng](https://tinypng.com) service.
 
 - Drag and drop.
 - Multiple directories.
+- Retry all failures.
 - Export location.
 - Apple shortcut.
-- Window and Linux?
 
 ## 🚀 Released
+
+**v1.0.2**
+
+- License updated (MIT).
+- Api key remember check box.
+- [Download](https://bitbucket.org/HocTran/tinycompressor/downloads/Tiny_v1.0.2.app.zip)
 
 **v1.0.1**
 
