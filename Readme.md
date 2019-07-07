@@ -48,6 +48,9 @@ All original images will be replaced by new compressed images.
 
   **Note**: Export location option is being built, please backup your original images if needed before process.
 
+## License
+Tiny is released under the MIT license. See [LICENSE](https://bitbucket.org/HocTran/tinycompressor/src/master/Readme.md) for details.
+
 ## Screenshots
 
 ![alt text](https://i.ibb.co/K7www2X/Screen-Shot-2019-06-22-at-11-07-46-PM.png "Opening")
