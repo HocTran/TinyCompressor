@@ -29,19 +29,17 @@ The app built rely on [TinyPng](https://tinypng.com) service.
 - Api key remember check box.
 - [Download](https://bitbucket.org/HocTran/tinycompressor/downloads/Tiny_v1.0.2.app.zip)
 
-**v1.0.1**
-
-- Hot-fix for syntax changes and documentation.
-- [Download](https://bitbucket.org/HocTran/tinycompressor/downloads/Tiny_v1.0.1.app.zip)
-
-**v1.0.0**
-
-- First release version.
-- [Download](https://bitbucket.org/HocTran/tinycompressor/downloads/Tiny_v1.0.0.app.zip)
-
 ## How to use
 
-- Input your Tiny key. See in [dashboard page](https://tinypng.com/dashboard/api).
+- **(Only for first time download)**. You may got the prevention from **Mac Gatekeeper**
+
+  > Tiny_v1.0.2 can’t be opened because it is from an unidentified developer.
+  
+  To temporarily bypass Gatekeeper, right-click (or **Control-click**) on the app’s icon and select **Open**.
+
+  You’ll still receive an alert message, but this time it’s only a warning. Clicking **Open** again will launch the app.
+
+- Input your **Tiny key**. See it in the [dashboard page](https://tinypng.com/dashboard/api).
 - Press **"Open"** to select the files of images or images directory.
 - Press **"Start"** and ... done 🎉.
 All original images will be replaced by new compressed images.
