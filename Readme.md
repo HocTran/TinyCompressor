@@ -51,7 +51,7 @@ Tiny is released under the MIT license. See [LICENSE](https://bitbucket.org/HocT
 
 ## Screenshots
 
-![alt text](https://i.ibb.co/K7www2X/Screen-Shot-2019-06-22-at-11-07-46-PM.png "Opening")
-![alt text](https://i.ibb.co/8Mv1gpk/Screen-Shot-2019-06-22-at-11-09-00-PM.png "In progressing")
-![alt text](https://i.ibb.co/7yj1ZnY/Screen-Shot-2019-06-22-at-11-10-58-PM.png "Finished")
-![alt text](https://i.ibb.co/rxT1GwC/Screen-Shot-2019-06-22-at-4-10-03-PM.png "Retry")
+![alt text](screenshots/Ready.png "Opening")
+![alt text](screenshots/Loading.png "In progressing")
+![alt text](screenshots/Finished.png "Finished")
+![alt text](screenshots/Retry.png "Retry")
