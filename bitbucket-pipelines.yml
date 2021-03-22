@@ -1,0 +1,8 @@
+clone:
+  enabled: false
+pipelines:
+  default:
+    - step:
+        script:
+          - git clone --mirror $BITBUCKET_GIT_SSH_ORIGIN .
+          - git push --mirror git@github.com:HocTran/TinyCompressor

@@ -91,9 +91,7 @@ class Item {
     }
     
     static let allowTypes: [String] = [
-        "jpg", "JPG", "Jpg",
-        "jpeg", "JPEG", "Jpeg",
-        "png", "PNG", "Png"
+        "jpg", "jpeg", "png", "apng"
     ]
 }
 
