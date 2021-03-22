@@ -1,14 +1,14 @@
 # Lightweight PNG and JPEG compressor for Mac - TinyPng client
 
-Mac OS app provide an easy GUI for image compression.
+Mac OS app provides an easy GUI for image compression.
 
-The app built rely on [TinyPng](https://tinypng.com) service.
+The app relies on [TinyPng](https://tinypng.com) service.
 
 ## 🔑 Features
 
 - **Universal app supports both Intel or Apple Silicon**
 - Works with PNG/APNG and JPEG format.
-- Support individual file, multiple files or fully recursive image directory.
+- Support individual file, multiple files, or fully recursive image directory.
 - Concurrent processing (max 10 files).
 - Retry if any failure.
 - Colorize status and simple UI.
@@ -27,7 +27,7 @@ The app built rely on [TinyPng](https://tinypng.com) service.
 **v1.0.3**
 
 - **Universal app supports both Intel or Apple Silicon**
-- Mirroring to [Github repo](https://github.com/HocTran/TinyCompressor).
+- Update close/reopen the app window.
 - [Download](https://bitbucket.org/HocTran/tinycompressor/downloads/Tiny_v1.0.3.app.zip)
 
 **v1.0.2**
