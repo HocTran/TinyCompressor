@@ -6,7 +6,8 @@ The app built rely on [TinyPng](https://tinypng.com) service.
 
 ## 🔑 Features
 
-- Works with PNG and JPEG format.
+- **Universal app supports both Intel or Apple Silicon**
+- Works with PNG/APNG and JPEG format.
 - Support individual file, multiple files or fully recursive image directory.
 - Concurrent processing (max 10 files).
 - Retry if any failure.
@@ -22,6 +23,12 @@ The app built rely on [TinyPng](https://tinypng.com) service.
 - Apple shortcut.
 
 ## 🚀 Released
+
+**v1.0.3**
+
+- **Universal app supports both Intel or Apple Silicon**
+- Mirroring to [Github repo](https://github.com/HocTran/TinyCompressor).
+- [Download](https://bitbucket.org/HocTran/tinycompressor/downloads/Tiny_v1.0.3.app.zip)
 
 **v1.0.2**
 
@@ -47,7 +54,7 @@ All original images will be replaced by new compressed images.
   **Note**: Export location option is being built, please backup your original images if needed before process.
 
 ## License
-Tiny is released under the MIT license. See [LICENSE](https://bitbucket.org/HocTran/tinycompressor/src/master/Readme.md) for details.
+Tiny is released under the MIT license. See [LICENSE](./LICENSE.md) for details.
 
 ## Screenshots
 
